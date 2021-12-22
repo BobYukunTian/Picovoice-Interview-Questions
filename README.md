@@ -1,5 +1,6 @@
 # Picovoice Interview Questions 
-#### Solution by Bob Tian
+Solution by Bob Tian
+
 ## Q1 [C, Python] 
 
 Assume we have a function get_book_info(isbn) that takes a string ISBN argument and retrieves an object containing the Title, Author, and Language of a book (each represented as a string) that takes a nontrivial amount of time to run (perhaps because it’s making a call to a database). Write a wrapper function that increases performance by keeping results in memory for the quick lookup. To prevent memory from growing unbounded, we only want to store a maximum of N book records. At any given time, we should be storing the N books that we accessed most recently. Assume that N can be a large number when choosing data structure(s) and algorithm(s). 
