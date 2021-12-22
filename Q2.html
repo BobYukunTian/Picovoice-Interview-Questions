@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <h1>Q2</h1>
+</head>
+
+<body>
+  User ID:
+  <input type="text" id="userid" name="userid" value="1000"><br><br>
+  Product 501
+  <div id="product501"></div>
+  Product 502
+  <div id="product502"></div>
+  Product 503
+  <div id="product503"></div>
+  Product 504
+  <div id="product504"></div>
+  Product 505
+  <div id="product505"></div>
+</body>
+
+<script>
+  const svgNS = "http://www.w3.org/2000/svg";
+  init();
+
+  function init() {
+    //init SVG and display rating for 5 products
+    createSymbol();
+    createRating("product501");
+    createRating("product502");
+    createRating("product503");
+    createRating("product504");
+    createRating("product505");
+  }
+
+  function createSymbol() {
+    //create star SVG symbol (hiden)
+    var svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", 0);
+    svg.setAttribute("height", 0);
+    //make a symbol to use in other SVG later
+    var symbol = document.createElementNS(svgNS, "symbol");
+    symbol.setAttribute("id", "star");
+    symbol.setAttribute("width", 100);
+    symbol.setAttribute("height", 100);
+    symbol.setAttribute("viewbox", "0 0 100 100");
+    // draw a star shape polygon
+    var polygon = document.createElementNS(svgNS, "polygon");
+    polygon.setAttribute("points", "50 165 55 180 70 180 60 190 65 205 50 195 35 205 40 190 30 180 45 180");
+    polygon.setAttribute("stroke", "black");
+    polygon.setAttribute("stroke-width", 3);
+    polygon.setAttribute("transform", "translate(10, -150)");
+    symbol.appendChild(polygon);
+    svg.appendChild(symbol);
+    document.body.appendChild(svg);
+  }
+
+  function createRating(divID) {
+    //creating a 5-star rating widget and append to input div id 
+    var div = document.getElementById(divID);
+    var svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", 400);
+    svg.setAttribute("height", 100);
+    //make 5 stars with star symbol created and add mouse event handers
+    for (let i = 0; i < 5; i++) {
+      var star = document.createElementNS(svgNS, "use");
+      star.setAttribute("href", "#star");
+      star.setAttribute("value", i + 1);
+      star.setAttribute("x", i * 60);
+      star.setAttribute("y", 0);
+      star.setAttribute("onmouseover", "greyOut(this)");
+      star.setAttribute("onmouseleave", "reset(this)");
+      star.setAttribute("onclick", "sendRating(this)");
+      star.setAttribute("fill", "transparent");
+      svg.appendChild(star);
+    }
+    div.appendChild(svg);
+  }
+
+  function greyOut(element) {
+    //set color to grey when mouse over
+    for (let i = 0; i < element.getAttribute("value"); i++) {
+      element.parentNode.children[i].setAttribute("fill", "grey");
+    }
+  }
+
+  function reset(element) {
+    //reset color of star when mouse leave
+    var g = element.parentNode.children;
+    for (let i = 0; i < 5; i++) {
+      g[i].setAttribute("fill", "transparent");
+    }
+  }
+
+  function sendRating(element) {
+    //disable mouse event handler after rating
+    var g = element.parentNode.children;
+    for (let i = 0; i < 5; i++) {
+      g[i].removeAttribute("onmouseleave");
+      g[i].removeAttribute("onmouseover");
+      g[i].removeAttribute("onclick");
+    }
+    //change color to black
+    for (let i = 0; i < element.getAttribute("value"); i++) {
+      g[i].setAttribute("fill", "black");
+    }
+
+    //send post request to back-end server
+    var userid = document.getElementById("userid").value;
+    var url = "https://localhost/rating/post/json"; //fake server url for testing only
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    var data = { "user": userid, "product": element.parentNode.parentNode.parentNode.id, "rating": element.getAttribute("value") };
+    xhr.send(JSON.stringify(data));
+    console.log("Rating sent to server");
+    console.log(data);
+  }
+</script>
+
+</html>
